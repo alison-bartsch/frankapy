@@ -47,7 +47,7 @@ if __name__ == "__main__":
     fa.goto_pose(T_ee_world)
 
     # open gripper
-    # fa.open_gripper()
+    fa.open_gripper()
 
     # move to home position
     # lower in the z-direction to be above the cup
