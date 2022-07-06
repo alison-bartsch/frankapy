@@ -1212,7 +1212,7 @@ class FrankaArm:
                 Skill description to use for logging on control-pc.
 
         Raises:
-            ValueError: If width is less than 0 or greater than TODO(jacky)
+            ValueError: If width is less than 0 or greater than 
                 the maximum gripper opening
         """
 
