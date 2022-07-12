@@ -1,6 +1,6 @@
 # frankapy
 
-This is a software package used for controlling and learning skills on the Franka Emika Panda Research Robot Arm in the [Mechanical and AI Lab](https://sites.google.com/view/barati). We have adapted the software package from the original provided by IAM Lab, available here: [https://iamlab-cmu.github.io/frankapy](https://iamlab-cmu.github.io/frankapy). The original software package citation is listed at the bottom of the page.
+This is a software package used for controlling and learning skills on the Franka Emika Panda Research Robot Arm in the [Mechanical and AI Lab](https://sites.google.com/view/barati). We have adapted the software package from the original provided by [Intelligent Autonomous Manipulation Lab](https://labs.ri.cmu.edu/iam/), available here: [https://iamlab-cmu.github.io/frankapy](https://iamlab-cmu.github.io/frankapy). The original software package citation is listed at the bottom of the page.
 
 ```
 @article{zhang2020modular,
