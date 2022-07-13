@@ -17,6 +17,8 @@ if __name__ == "__main__":
     with open('Pick_and_Place_Motion.p', 'rb') as pickle_file:
         way_points = pickle.load(pickle_file)
     
+    way_points = way_points[13:]
+
     fa = FrankaArm()
     
     # reset franka to its home joints
@@ -37,8 +39,8 @@ if __name__ == "__main__":
     for waypoint in way_points:
         T_ee_world = fa.get_pose()
         print('Way Point:', waypoint)
-        T_ee_world.translation = waypoint[0:3]
-        fa.goto_pose(T_ee_world)
+        T_ee_world.translation = waypoint[0:3] + np.array([0, 0, 0.05])
+        fa.goto_pose(T_ee_world, ignore_virtual_walls=True)
         fa.goto_gripper(waypoint[3])    
 
     # reset franka back to home

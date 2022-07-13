@@ -11,6 +11,7 @@ from franka_interface_msgs.msg import SensorDataGroup
 from frankapy.utils import min_jerk, min_jerk_weight
 
 import rospy
+import time
 
 if __name__ == "__main__":
     fa = FrankaArm()
@@ -18,33 +19,48 @@ if __name__ == "__main__":
 
     rospy.loginfo('Generating Trajectory')
 
-    pose_traj = pkl.load(open('franka_traj.pkl','rb'))
+    pose_traj = pkl.load(open('demo_scripts/Pick_and_Place_Motion.p','rb'))
 
     print("Pose Traj. Size: ", len(pose_traj))
 
-    T = 10
-    dt = 0.01
+    T = 15
+    dt = 0.2
     ts = np.arange(0, T, dt)
 
     print("ts length: ", len(ts))
 
-    assert False
+    pose = fa.get_pose()
+    print("Robot Resting Pose: ", pose)
+    # assert False
 
     rospy.loginfo('Initializing Sensor Publisher')
     pub = rospy.Publisher(FC.DEFAULT_SENSOR_PUBLISHER_TOPIC, SensorDataGroup, queue_size=10)
     rate = rospy.Rate(1 / dt)
 
+    start_pose = pose
+    print('start pose: ', start_pose)
+    start_pose.translation = pose_traj[1][0:3]
+    print('edited start pose: ', start_pose)
+
+    # assert False
+
     rospy.loginfo('Publishing pose trajectory...')
     # To ensure skill doesn't end before completing trajectory, make the buffer time much longer than needed
-    fa.goto_pose(pose_traj[1], duration=T, dynamic=True, buffer_time=10,
+    fa.goto_pose(start_pose)
+    fa.goto_pose(start_pose, duration=T, dynamic=True, buffer_time=10,
         cartesian_impedances=[600.0, 600.0, 600.0, 50.0, 50.0, 50.0]
     )
+
+    print("\nWent to initial pose!")
+    #time.sleep(5)
+
     init_time = rospy.Time.now().to_time()
     for i in range(2, len(ts)):
+        print("\nIterating through...")
         timestamp = rospy.Time.now().to_time() - init_time
         traj_gen_proto_msg = PosePositionSensorMessage(
             id=i, timestamp=timestamp,
-            position=pose_traj[i].translation, quaternion=pose_traj[i].quaternion
+            position=pose_traj[i][0:3]*np.array([1, 1, 1]) + np.array([0, 0, 0.05]), quaternion=pose.quaternion
 		)
         ros_msg = make_sensor_group_msg(
             trajectory_generator_sensor_msg=sensor_proto2ros_msg(
