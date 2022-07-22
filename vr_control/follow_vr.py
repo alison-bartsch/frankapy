@@ -25,8 +25,7 @@ if __name__ == "__main__":
     fa = FrankaArm()
     fa.reset_joints()
 
-    rospy.loginfo('Generating Trajectory')
-
+    # load in the trajectory - should be replaced for final version
     pose_traj = pkl.load(open('demo_scripts/Pick_and_Place_Motion.p','rb'))
     print("Pose Traj. Size: ", len(pose_traj))
 
@@ -34,33 +33,32 @@ if __name__ == "__main__":
     dt = 0.2
     ts = np.arange(0, T, dt)
 
-    print("ts length: ", len(ts))
-
     pose = fa.get_pose()
     print("Robot Resting Pose: ", pose)
-    # assert False
 
+    # initialize the publisher
     rospy.loginfo('Initializing Sensor Publisher')
     pub = rospy.Publisher(FC.DEFAULT_SENSOR_PUBLISHER_TOPIC, SensorDataGroup, queue_size=10)
     rate = rospy.Rate(1 / dt)
 
+    # initialize the subscriber
+    # should subscribe to the VR topic & have a simpler custom message, similar queue size
+
     start_pose = pose
-    print('start pose: ', start_pose)
     start_pose.translation = pose_traj[1][0:3]
-    print('edited start pose: ', start_pose)
 
-    # assert False
-
+    # move the robot to the initial location of the trajectory
     rospy.loginfo('Publishing pose trajectory...')
     # To ensure skill doesn't end before completing trajectory, make the buffer time much longer than needed
     fa.goto_pose(start_pose)
     fa.goto_pose(start_pose, duration=T, dynamic=True, buffer_time=10,
         cartesian_impedances=[600.0, 600.0, 600.0, 50.0, 50.0, 50.0]
     )
-
     print("\nWent to initial pose!")
-    #time.sleep(5)
 
+
+    # begin the loop checking for VR commands & executing them
+    
     init_time = rospy.Time.now().to_time()
     for i in range(2, len(ts)):
         timestamp = rospy.Time.now().to_time() - init_time
