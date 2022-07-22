@@ -523,7 +523,7 @@ class Skill:
 
     # Add checks for these
     def create_goal(self):
-        goal = ExecuteSkillGoal()
+        goal = ExecuteSkillGoal() 
         goal.skill_type = self._skill_type
         goal.skill_description = self._skill_desc
         goal.meta_skill_type = self._meta_skill_type

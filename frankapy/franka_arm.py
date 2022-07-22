@@ -373,7 +373,7 @@ class FrankaArm:
                           TrajectoryGeneratorType.PassThroughPoseTrajectoryGenerator,
                           feedback_controller_type=FeedbackControllerType.CartesianImpedanceFeedbackController,
                           termination_handler_type=TerminationHandlerType.TimeTerminationHandler, 
-                          skill_desc=skill_desc)
+                          skill_desc=skill_desc) 
             use_impedance=True
             block = False
         else:
@@ -414,14 +414,18 @@ class FrankaArm:
         skill.add_goal_pose(duration, tool_base_pose)
         goal = skill.create_goal()
 
+
         self._send_goal(goal,
                         cb=lambda x: skill.feedback_callback(x),
                         block=block,
                         ignore_errors=ignore_errors)
 
+        # self.wait_for_skill()
+        # print("Done waiting for skill...")
+
         if dynamic:
             sleep(FC.DYNAMIC_SKILL_WAIT_TIME)
-
+    
     def goto_pose_delta(self,
                         delta_tool_pose,
                         duration=3,
@@ -1249,6 +1253,7 @@ class FrankaArm:
                 grasp_skill.epsilon.outer = epsilon_outer
                 self._gripper_grasp_client.send_goal(grasp_skill)
             else:
+                print("\nNOT GRASP")
                 move_skill = MoveGoal()
                 move_skill.width = width
                 move_skill.speed = speed

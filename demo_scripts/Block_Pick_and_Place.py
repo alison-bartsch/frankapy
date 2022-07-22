@@ -35,12 +35,20 @@ if __name__ == "__main__":
     print('Gripper width: {}'.format(gripper_width))
 
 
+    waypoint = way_points[0]
+    T_ee_world = fa.get_pose()
+    print('Way Point:', waypoint)
+    T_ee_world.translation = waypoint[0:3] + np.array([0, 0, 0.05])
+    fa.goto_pose(T_ee_world)
+    fa.goto_gripper(waypoint[3])    
+
+
     # move to each waypoint
-    for waypoint in way_points:
+    for waypoint in way_points[1:]:
         T_ee_world = fa.get_pose()
         print('Way Point:', waypoint)
         T_ee_world.translation = waypoint[0:3] + np.array([0, 0, 0.05])
-        fa.goto_pose(T_ee_world, ignore_virtual_walls=True)
+        fa.goto_pose(T_ee_world, dynamic=True)
         fa.goto_gripper(waypoint[3])    
 
     # reset franka back to home
