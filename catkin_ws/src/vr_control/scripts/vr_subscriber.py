@@ -23,6 +23,8 @@ def callback(data):
 	pose_traj = data.data
 	timestamp = rospy.Time.now().to_time()
 
+	# NOTE: if the current location far from desired next location -- do the scaled moement before using ROS message based control
+
 	# timestamp = rospy.Time.now().to_time() - init_time
     traj_gen_proto_msg = PosePositionSensorMessage(
         id=i, timestamp=timestamp,
@@ -73,17 +75,17 @@ if __name__ == '__main__':
     # initialize the subscriber
     # should subscribe to the VR topic & have a simpler custom message, similar queue size
 
-    start_pose = pose
-    start_pose.translation = pose_traj[1][0:3]
+    # start_pose = pose
+    # start_pose.translation = pose_traj[1][0:3]
 
-    # move the robot to the initial location of the trajectory
-    rospy.loginfo('Publishing pose trajectory...')
-    # To ensure skill doesn't end before completing trajectory, make the buffer time much longer than needed
-    fa.goto_pose(start_pose)
-    fa.goto_pose(start_pose, duration=T, dynamic=True, buffer_time=10,
-        cartesian_impedances=[600.0, 600.0, 600.0, 50.0, 50.0, 50.0]
-    )
-    print("\nWent to initial pose!")
+    # # move the robot to the initial location of the trajectory
+    # rospy.loginfo('Publishing pose trajectory...')
+    # # To ensure skill doesn't end before completing trajectory, make the buffer time much longer than needed
+    # fa.goto_pose(start_pose)
+    # fa.goto_pose(start_pose, duration=T, dynamic=True, buffer_time=10,
+    #     cartesian_impedances=[600.0, 600.0, 600.0, 50.0, 50.0, 50.0]
+    # )
+    # print("\nWent to initial pose!")
 
     # enter the loop of subscribing to the vr commands
 	listener()

@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
     rospy.loginfo('Generating Trajectory')
 
-    pose_traj = pkl.load(open('demo_scripts/Pick_and_Place_Motion.p','rb'))
+    pose_traj = pkl.load(open('Pick_and_Place_Motion.p','rb'))
     print("Pose Traj. Size: ", len(pose_traj))
 
     T = 15
@@ -74,7 +74,7 @@ if __name__ == "__main__":
             )
 
         # NOTE: there is some delay due to the speed of moving the gripper, by increasing the speed from standard, we are able to follow trajectory more closely
-        fa.goto_gripper(pose_traj[i][3], block=False, speed=0.1)
+        fa.goto_gripper(pose_traj[i][3], block=False, grasp=True, speed=0.1)
         print("\nDesired Gripper Width: ", pose_traj[i][3], "Current Gripper State: ", fa.get_gripper_width())
 
         rospy.loginfo('Publishing: ID {}'.format(traj_gen_proto_msg.id))

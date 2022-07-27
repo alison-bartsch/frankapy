@@ -15,10 +15,11 @@ def talker():
 	# load in the trajectory
 	# iterate through the elements
 	# publish the x,y,z,gripper width as a list?
-	pose_traj = pkl.load(open('demo_scripts/Pick_and_Place_Motion.p','rb'))
+	pose_traj = pkl.load(open('vr_control/scripts/Pick_and_Place_Motion.p','rb'))
 
 	for elem in pose_traj:
-		msg = {}
+		msg = Float32MultiArray()
+		# msg["layout"] = 1
 		msg.data = elem
 		rospy.loginfo(msg)
 		pub.publish(msg)
@@ -30,8 +31,8 @@ def talker():
 	# 	pub.publish(hello_str)
 	# 	rate.sleep()
 
-	if __name__ == '__main__':
-		try:
-			talker()
-		except rospy.ROSInterruptException:
-			pass
+if __name__ == '__main__':
+	try:
+		talker()
+	except rospy.ROSInterruptException:
+		pass

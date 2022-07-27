@@ -14,6 +14,8 @@ from itertools import product
 import roslib
 roslib.load_manifest('franka_interface_msgs')
 import rospy
+import actionlib
+import franka_gripper
 from actionlib import SimpleActionClient
 from sensor_msgs.msg import JointState
 from franka_interface_msgs.msg import ExecuteSkillAction
@@ -65,6 +67,9 @@ class FrankaArm:
             Flag for whether to run the robot in the real world.
 
         """
+
+        print(actionlib.__file__)
+        print(franka_gripper.__file__)
 
         self._execute_skill_action_server_name = \
                 '/execute_skill_action_server_node_{}/execute_skill'.format(robot_num)
