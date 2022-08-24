@@ -68,8 +68,8 @@ class FrankaArm:
 
         """
 
-        print(actionlib.__file__)
-        print(franka_gripper.__file__)
+        # print(actionlib.__file__)
+        # print(franka_gripper.__file__)
 
         self._execute_skill_action_server_name = \
                 '/execute_skill_action_server_node_{}/execute_skill'.format(robot_num)
@@ -1258,7 +1258,6 @@ class FrankaArm:
                 grasp_skill.epsilon.outer = epsilon_outer
                 self._gripper_grasp_client.send_goal(grasp_skill)
             else:
-                print("\nNOT GRASP")
                 move_skill = MoveGoal()
                 move_skill.width = width
                 move_skill.speed = speed
@@ -2058,7 +2057,7 @@ class FrankaArm:
             skill_desc : :obj:`str` 
                 Skill description to use for logging on control-pc.
         """
-        self.goto_joints(FC.HOME_JOINTS, duration=duration, skill_desc=skill_desc, block=block, ignore_errors=ignore_errors)
+        self.goto_joints(FC.HOME_JOINTS, duration=duration, skill_desc=skill_desc, block=block, ignore_errors=ignore_errors, ignore_virtual_walls=True)
 
     def reset_pose(self, duration=5, block=True, ignore_errors=True, skill_desc=''):
         """

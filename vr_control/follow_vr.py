@@ -13,24 +13,28 @@ from frankapy.utils import min_jerk, min_jerk_weight
 import rospy
 import time
 
-# NOTE: In order to turn this script into live-immitating the VR controller pose/gripper width, we would need
-# a subscriber in here that loads in the trajectory step by step. Instead of iterating through pose_traj in a 
-# for loop, would have a while loop for while getting commands from VR ros node (or whatever we call it)
+# from perception_utils.realsense import get_first_realsense_sensor
+from franka_gripper.msg import *
+from actionlib import SimpleActionClient
 
-# NOTE: It actually would be helpful to get more steps in the trajectory, as one of the issues is that the 
-# gripper closing can lag behind because the step size between trajectory points is quite large (e.g. 0.8 to 
-# 0.6 in one step), which since the gripper and pose are decoupled can cause the timings to mis-align
 
 if __name__ == "__main__":
+    """
+    This file takes an end-effector trajectory collected in VR and plays through
+    it smoothly.
+    """
+
     fa = FrankaArm()
     fa.reset_joints()
 
     # load in the trajectory - should be replaced for final version
-    pose_traj = pkl.load(open('demo_scripts/Pick_and_Place_Motion.p','rb'))
+    pose_traj = pkl.load(open('franka_full_oculus_data_test.pkl','rb'))
     print("Pose Traj. Size: ", len(pose_traj))
 
-    T = 15
-    dt = 0.2
+    offset = np.array([0, 0, 0.025])
+    block_width = 0.03
+    T = 10
+    dt = T/np.shape(pose_traj)[0]
     ts = np.arange(0, T, dt)
 
     pose = fa.get_pose()
@@ -41,45 +45,64 @@ if __name__ == "__main__":
     pub = rospy.Publisher(FC.DEFAULT_SENSOR_PUBLISHER_TOPIC, SensorDataGroup, queue_size=10)
     rate = rospy.Rate(1 / dt)
 
-    # initialize the subscriber
-    # should subscribe to the VR topic & have a simpler custom message, similar queue size
-
-    start_pose = pose
-    start_pose.translation = pose_traj[1][0:3]
+    start_pose = pose 
+    start_pose.translation = pose_traj[1][0:3] + offset
 
     # move the robot to the initial location of the trajectory
     rospy.loginfo('Publishing pose trajectory...')
+
     # To ensure skill doesn't end before completing trajectory, make the buffer time much longer than needed
     fa.goto_pose(start_pose)
-    fa.goto_pose(start_pose, duration=T, dynamic=True, buffer_time=10,
+    fa.goto_pose(start_pose, duration=(T), dynamic=True, buffer_time=10,
         cartesian_impedances=[600.0, 600.0, 600.0, 50.0, 50.0, 50.0]
     )
+    fa.goto_gripper(pose_traj[1][3])
     print("\nWent to initial pose!")
 
-
-    # begin the loop checking for VR commands & executing them
-    
     init_time = rospy.Time.now().to_time()
     for i in range(2, len(ts)):
         timestamp = rospy.Time.now().to_time() - init_time
         traj_gen_proto_msg = PosePositionSensorMessage(
             id=i, timestamp=timestamp,
-            position=pose_traj[i][0:3]*np.array([1, 1, 1]) + np.array([0, 0, 0.05]), quaternion=pose.quaternion
+            position=pose_traj[i][0:3]*np.array([1, 1, 1]) + offset, quaternion=pose.quaternion
 		)
         ros_msg = make_sensor_group_msg(
             trajectory_generator_sensor_msg=sensor_proto2ros_msg(
                 traj_gen_proto_msg, SensorDataMessageType.POSE_POSITION),
             )
 
-        # NOTE: there is some delay due to the speed of moving the gripper, by increasing the speed from standard, we are able to follow trajectory more closely
-        fa.goto_gripper(pose_traj[i][3], block=False, speed=0.1)
-        print("\nDesired Gripper Width: ", pose_traj[i][3], "Current Gripper State: ", fa.get_gripper_width())
+
+        min_gripper_delay = 0.2
+        gripper_update_rate = 1 + int(min_gripper_delay/dt)
+        if i % gripper_update_rate == 0:
+            difference = pose_traj[i][3] - fa.get_gripper_width()
+            speed = abs(difference/(dt*gripper_update_rate ))
+            print("\nSpeed: ", speed)
+            if speed > 0.15:
+                speed = 0.15
+            if abs(difference) > 0.001:
+                if difference >= 0:
+                    print("opening")
+                    fa.goto_gripper(pose_traj[i][3], block=False, grasp=False, speed=speed)
+                else:
+                    print("closing")
+                    fa.goto_gripper(pose_traj[i][3], block=False, grasp=True, speed=speed)
+                print("Desired Gripper Width: ", pose_traj[i][3], "Current Gripper State: ", fa.get_gripper_width())
+            else:
+                print("do nothing :)")
 
         rospy.loginfo('Publishing: ID {}'.format(traj_gen_proto_msg.id))
         pub.publish(ros_msg)
         rate.sleep()
 
-        
+    # fa.goto_gripper(0.05, block=True, grasp=False, speed=0.04)
+
+    fa.stop_gripper()
+    print('stop gripper')
+    fa.open_gripper()
+    print('start sleep')
+    time.sleep(5)
+
     # Stop the skill
     # Alternatively can call fa.stop_skill()
     term_proto_msg = ShouldTerminateSensorMessage(timestamp=rospy.Time.now().to_time() - init_time, should_terminate=True)
@@ -89,4 +112,8 @@ if __name__ == "__main__":
         )
     pub.publish(ros_msg)
 
+    print("Gripper State: ", fa.get_gripper_width())
+
     rospy.loginfo('Done')
+
+    print("Gripper State: ", fa.get_gripper_width())

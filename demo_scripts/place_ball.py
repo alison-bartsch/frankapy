@@ -1,6 +1,5 @@
 import numpy as np
 from autolab_core import RigidTransform
-
 from frankapy import FrankaArm
 
 """
@@ -48,28 +47,6 @@ if __name__ == "__main__":
 
     # open gripper
     fa.open_gripper()
-
-    # move to home position
-    # lower in the z-direction to be above the cup
-    # open the gripper to release the ball
-    # move back to home position
-
-
-
-
-    # print('\nTossing joint changes')
-    # joints = fa.get_joints()
-    # print('Joints: ', joints)
-    # joints[5] -= np.deg2rad(10)
-    # joints[3] -= np.deg2rad(10)
-    # fa.goto_joints(joints)
-    # print('Joints: ', joints)
-    # joints[5] += np.deg2rad(30)
-    # joints[3] += np.deg2rad(15)
-    # fa.goto_joints(joints)
-    # print('Joints: ', joints)
-
-    
 
     # reset franka back to home
     fa.reset_joints()
