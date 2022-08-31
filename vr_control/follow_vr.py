@@ -71,7 +71,6 @@ if __name__ == "__main__":
                 traj_gen_proto_msg, SensorDataMessageType.POSE_POSITION),
             )
 
-
         min_gripper_delay = 0.2
         gripper_update_rate = 1 + int(min_gripper_delay/dt)
         if i % gripper_update_rate == 0:

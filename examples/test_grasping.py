@@ -26,10 +26,10 @@ if __name__ == "__main__":
 	time.sleep(4)
 
 	# testing grasps
-	# print("Grasp = True")
-	# fa.goto_gripper(0.02, grasp=True, force=10.0)
-	# fa.open_gripper()
-
-	print("grasp = False")
-	fa.goto_gripper(0.0, grasp=False)
+	print("Grasp = True")
+	fa.goto_gripper(0.02, grasp=True, force=10.0)
 	fa.open_gripper()
+
+	# print("grasp = True")
+	# fa.goto_gripper(0.0, grasp=True, force=10.0)
+	# fa.open_gripper()
