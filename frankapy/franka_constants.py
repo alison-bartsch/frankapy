@@ -178,7 +178,7 @@ class FrankaConstants:
         [0.2, 0, 1, 0, 0, 0, 1.2, 1, 0.01],
         # bottom
         # [0.2, 0, -0.05, 0, 0, 0, 1.2, 1, 0.01]
-        [0.2, 0, 0.0199, 0, 0, 0, 1.2, 1, 0.01]
+        [0.2, 0, 0.01, 0, 0, 0, 1.2, 1, 0.01]
     ])
 
     DEFAULT_SENSOR_PUBLISHER_TOPIC = 'franka_ros_interface/sensor'
