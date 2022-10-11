@@ -36,12 +36,17 @@ if __name__ == "__main__":
     gripper_width = fa.get_gripper_width()
     print('Gripper width: {}'.format(gripper_width))
 
+    # move to center
+    T_ee_world = fa.get_pose()
+    T_ee_world.translation += [0.4, 0, 0.1]
+    fa.goto_pose(T_ee_world)
+
     # joint controls
     print('\nRotating last joint')
     joints = fa.get_joints()
-    joints[6] += np.deg2rad(45)
+    joints[6] += np.deg2rad(20)
     fa.goto_joints(joints)
-    joints[6] -= np.deg2rad(45)
+    joints[6] -= np.deg2rad(20)
     fa.goto_joints(joints)
 
     print('\nRotating wrist joint')

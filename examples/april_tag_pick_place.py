@@ -55,15 +55,15 @@ if __name__ == "__main__":
 
     logging.info('Starting robot')
     fa = FrankaArm()
-    fa.set_tool_delta_pose(T_camera_mount_delta)
-    fa.reset_joints()
-    fa.open_gripper()
+    # fa.set_tool_delta_pose(T_camera_mount_delta)
+    # fa.reset_joints()
+    # fa.open_gripper()
 
-    T_ready_world = fa.get_pose()
-    T_ready_world.translation[0] += 0.25
-    T_ready_world.translation[2] = 0.4
+    # T_ready_world = fa.get_pose()
+    # T_ready_world.translation[0] += 0.25
+    # T_ready_world.translation[2] = 0.4
 
-    fa.goto_pose(T_ready_world)
+    # fa.goto_pose(T_ready_world)
 
     logging.info('Init camera')
     sensor = get_first_realsense_sensor(cfg['rs'])
@@ -97,16 +97,16 @@ if __name__ == "__main__":
         vis3d.pose(T_lift_world)
         vis3d.show()
 
-    if not args.no_grasp:
-        logging.info('Commanding robot')
-        fa.goto_pose(T_lift_world, use_impedance=False)
-        fa.goto_pose(T_grasp_world, use_impedance=False)
-        fa.close_gripper()
-        fa.goto_pose(T_lift_world, use_impedance=False)
-        sleep(3)
-        fa.goto_pose(T_grasp_world, use_impedance=False)
-        fa.open_gripper()
-        fa.goto_pose(T_lift_world, use_impedance=False)
-        fa.goto_pose(T_ready_world, use_impedance=False)
+    # if not args.no_grasp:
+    #     logging.info('Commanding robot')
+    #     fa.goto_pose(T_lift_world, use_impedance=False)
+    #     fa.goto_pose(T_grasp_world, use_impedance=False)
+    #     fa.close_gripper()
+    #     fa.goto_pose(T_lift_world, use_impedance=False)
+    #     sleep(3)
+    #     fa.goto_pose(T_grasp_world, use_impedance=False)
+    #     fa.open_gripper()
+    #     fa.goto_pose(T_lift_world, use_impedance=False)
+    #     fa.goto_pose(T_ready_world, use_impedance=False)
 
     import IPython; IPython.embed(); exit(0)

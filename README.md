@@ -3,7 +3,7 @@
 This is a software package used for controlling and learning skills on the Franka Emika Panda Research Robot Arm in the [Mechanical and AI Lab](https://sites.google.com/view/barati). We have adapted the software package from the original provided by [Intelligent Autonomous Manipulation Lab](https://labs.ri.cmu.edu/iam/), available here: [https://iamlab-cmu.github.io/frankapy](https://iamlab-cmu.github.io/frankapy). The original software package citation is listed at the bottom of the page. Our contributions are as follows:
 
 1. Creating an integrated VR teleoperation module to collect demonstration data
-2. INSERT
+2. Providing a modular vision system to perform autonomous object detection and pose estimation.
 
 ```
 @article{zhang2020modular,
