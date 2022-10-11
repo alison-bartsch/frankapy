@@ -5,6 +5,9 @@ from frankapy import FrankaArm
 
 
 if __name__ == "__main__":
+    """
+    This script demonstrates how to move the robot using the various movement commands in franka_arm.py
+    """
     fa = FrankaArm()
     
     # reset franka to its home joints
