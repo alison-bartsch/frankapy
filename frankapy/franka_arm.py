@@ -198,7 +198,7 @@ class FrankaArm:
             done = self._gripper_stop_client.wait_for_result()
         elif self._last_gripper_command == "Move":
             done = self._gripper_move_client.wait_for_result()
-        sleep(2)
+        # sleep(2)
 
 
     def is_skill_done(self, ignore_errors=True): 
@@ -1256,7 +1256,7 @@ class FrankaArm:
                 grasp_skill.force = force
                 grasp_skill.epsilon.inner = epsilon_inner
                 grasp_skill.epsilon.outer = epsilon_outer
-                self._gripper_grasp_client.send_goal(grasp_skill)
+                self._gripper_grasp_client.send_goal(grasp_skill, 1, 1)
             else:
                 move_skill = MoveGoal()
                 move_skill.width = width
