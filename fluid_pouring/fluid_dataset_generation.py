@@ -41,7 +41,7 @@ def vision_loop(moving_queue):
 	save_path = '/Dataset'
 	save_path = base + save_path
 
-	directory_name = 'run_' + str(8)
+	directory_name = 'run_' + str(9)
 	dir_path = os.path.join(save_path, directory_name)
 
 	if not os.path.exists(dir_path):
@@ -95,23 +95,26 @@ def vision_loop(moving_queue):
 def control_loop(fa, moving_queue):
 	pose = fa.get_pose()
 
-	# -------- Pouring Hard Coded for Data Collection ---------
-	# test next position
-	pose.translation = np.array([0.7, 0.2, 0.5])
-	fa.goto_pose(pose)
+	# # -------- Pouring Hard Coded for Data Collection ---------
+	# # test next position
+	# pose.translation = np.array([0.7, 0.2, 0.5])
+	# fa.goto_pose(pose)
 
-	# rotate wrist forward
-	joints = fa.get_joints()
-	joints[5] += np.deg2rad(20)
-	fa.goto_joints(joints, ignore_virtual_walls=True)
+	# # rotate wrist forward
+	# joints = fa.get_joints()
+	# joints[5] += np.deg2rad(20)
+	# fa.goto_joints(joints, ignore_virtual_walls=True)
 
-	# rotate wrist backward
-	joints[5] -= np.deg2rad(40)
-	fa.goto_joints(joints, ignore_virtual_walls=True)
+	# # rotate wrist backward
+	# joints[5] -= np.deg2rad(40)
+	# fa.goto_joints(joints, ignore_virtual_walls=True)
 
-	# rotate wrist backward more
-	joints[5] -= np.deg2rad(40)
-	fa.goto_joints(joints, ignore_virtual_walls=True)
+	# # rotate wrist backward more
+	# joints[5] -= np.deg2rad(40)
+	# fa.goto_joints(joints, ignore_virtual_walls=True)
+
+
+
 
 	# # -------- Translation and Rotation for Data Collection -------
 	# # test next position
