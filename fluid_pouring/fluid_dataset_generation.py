@@ -41,7 +41,7 @@ def vision_loop(moving_queue):
 	save_path = '/Dataset'
 	save_path = base + save_path
 
-	directory_name = 'run_' + str(5)
+	directory_name = 'run_' + str(8)
 	dir_path = os.path.join(save_path, directory_name)
 
 	if not os.path.exists(dir_path):
@@ -95,39 +95,15 @@ def vision_loop(moving_queue):
 def control_loop(fa, moving_queue):
 	pose = fa.get_pose()
 
+	# -------- Pouring Hard Coded for Data Collection ---------
 	# test next position
-	pose.translation = np.array([0.75, 0.2, 0.35])
-	fa.goto_pose(pose)
-
-	# test next position 
-	pose.translation = np.array([0.5, 0.2, 0.35])
-	fa.goto_pose(pose)
-
-	# go back to center
-	pose.translation = np.array([0.5, 0.2, 0.35])
-	fa.goto_pose(pose)
-
-	# move up
-	pose.translation = np.array([0.5, 0.2, 0.5])
-	fa.goto_pose(pose)
-
-	# move down
-	pose.translation = np.array([0.5, 0.2, 0.3])
-	fa.goto_pose(pose)
-
-	# go back to center
-	pose.translation = np.array([0.5, 0.2, 0.35])
+	pose.translation = np.array([0.7, 0.2, 0.5])
 	fa.goto_pose(pose)
 
 	# rotate wrist forward
 	joints = fa.get_joints()
 	joints[5] += np.deg2rad(20)
 	fa.goto_joints(joints, ignore_virtual_walls=True)
-
-	# # rotate wrist forward more
-	# joints = fa.get_joints()
-	# joints[5] += np.deg2rad(20)
-	# fa.goto_joints(joints, ignore_virtual_walls=True)
 
 	# rotate wrist backward
 	joints[5] -= np.deg2rad(40)
@@ -136,6 +112,49 @@ def control_loop(fa, moving_queue):
 	# rotate wrist backward more
 	joints[5] -= np.deg2rad(40)
 	fa.goto_joints(joints, ignore_virtual_walls=True)
+
+	# # -------- Translation and Rotation for Data Collection -------
+	# # test next position
+	# pose.translation = np.array([0.75, 0.2, 0.35])
+	# fa.goto_pose(pose)
+
+	# # test next position 
+	# pose.translation = np.array([0.5, 0.2, 0.35])
+	# fa.goto_pose(pose)
+
+	# # go back to center
+	# pose.translation = np.array([0.5, 0.2, 0.35])
+	# fa.goto_pose(pose)
+
+	# # move up
+	# pose.translation = np.array([0.5, 0.2, 0.5])
+	# fa.goto_pose(pose)
+
+	# # move down
+	# pose.translation = np.array([0.5, 0.2, 0.3])
+	# fa.goto_pose(pose)
+
+	# # go back to center
+	# pose.translation = np.array([0.5, 0.2, 0.35])
+	# fa.goto_pose(pose)
+
+	# # rotate wrist forward
+	# joints = fa.get_joints()
+	# joints[5] += np.deg2rad(20)
+	# fa.goto_joints(joints, ignore_virtual_walls=True)
+
+	# # # rotate wrist forward more
+	# # joints = fa.get_joints()
+	# # joints[5] += np.deg2rad(20)
+	# # fa.goto_joints(joints, ignore_virtual_walls=True)
+
+	# # rotate wrist backward
+	# joints[5] -= np.deg2rad(40)
+	# fa.goto_joints(joints, ignore_virtual_walls=True)
+
+	# # rotate wrist backward more
+	# joints[5] -= np.deg2rad(40)
+	# fa.goto_joints(joints, ignore_virtual_walls=True)
 
 	moving_queue.put(False)
 
