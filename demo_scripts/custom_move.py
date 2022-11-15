@@ -8,7 +8,7 @@ This function moves the Franka arm to any desired position.
 def move_to_pose(x, y, z):
     T_ee_world = fa.get_pose()
     print('Translation: {} | Rotation: {}'.format(T_ee_world.translation, T_ee_world.quaternion))
-    T_ee_world += [x, y, z]
+    T_ee_world.translation += [x, y, z]
     print("Moving the arm {}, {}, {}".format(x, y, z))
     print('Translation: {} | Rotation: {}'.format(T_ee_world.translation, T_ee_world.quaternion))
     fa.goto_pose(T_ee_world)
