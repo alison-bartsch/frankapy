@@ -44,6 +44,19 @@ if __name__ == "__main__":
     T_ee_world.translation += [0.4, 0, 0.1]
     fa.goto_pose(T_ee_world)
 
+    # move to negative y
+    T_ee_world = fa.get_pose()
+    T_ee_world.translation += [0, -0.1, 0]
+    fa.goto_pose(T_ee_world)
+    new_pose = fa.get_pose()
+    print("\nPose: ", new_pose)
+
+    # reset robot
+    fa.reset_pose()
+    fa.reset_joints()
+
+    assert False
+
     # joint controls
     print('\nRotating last joint')
     joints = fa.get_joints()
