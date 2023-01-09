@@ -24,6 +24,16 @@ def goto_grasp(fa, x, y, z, rx, ry, rz, d):
 	fa.goto_gripper(d)
 	time.sleep(3)
 
+	# MIN VALUES:
+		# rx: -50
+		# ry: -50
+		# rz: -180
+
+	# MAX VALUES:
+		# rx: 50
+		# ry: 50
+		# rz: 180
+
 	# TODO: clip the values of each parameter (or return an error) - particularly rx, ry, rz, and d [0, 0.08]
 	
 
