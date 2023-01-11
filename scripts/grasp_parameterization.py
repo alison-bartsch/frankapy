@@ -25,7 +25,7 @@ def goto_grasp(fa, x, y, z, rx, ry, rz, d):
 	time.sleep(3)
 
 	# MIN VALUES:
-		# rx: -50
+		# rx: -50 # NOTE: not a physical cutoff, could go to 90 if needed
 		# ry: -50
 		# rz: -180
 
