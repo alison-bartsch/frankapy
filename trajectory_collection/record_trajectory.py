@@ -1,3 +1,4 @@
+import os
 import cv2
 import time
 import queue
@@ -15,7 +16,38 @@ Goal: record the robot's pose and all 5 camera's RGBD info at each timestep and 
 # THREAD 1: have the robot execute some arbitrary trajectory
 # THREAD 2: have the robot save the pose and RGBD information (perhaps point clouds too???? maybe too data hungy) every N seconds
 
-def vision_loop(fa, moving, filename):
+def vision_loop(fa, moving, filename, folder_name):
+    # ----- Create Save Folders ------
+    save_path = 'Dataset/' + folder_name
+    if not os.path.exists(save_path):
+        os.mkdir(save_path)
+
+    image_save_path = save_path + '/color_images'
+    os.mkdir(image_save_path)
+    # depth_save_path = save_path + '/depth_images'
+    # os.mkdir(depth_save_path)
+    cam1_image_save_path = image_save_path + '/camera1'
+    os.mkdir(cam1_image_save_path)
+    cam2_image_save_path = image_save_path + '/camera2'
+    os.mkdir(cam2_image_save_path)
+    cam3_image_save_path = image_save_path + '/camera3'
+    os.mkdir(cam3_image_save_path)
+    cam4_image_save_path = image_save_path + '/camera4'
+    os.mkdir(cam4_image_save_path)
+    cam5_image_save_path = image_save_path + '/camera5'
+    os.mkdir(cam5_image_save_path)
+    # cam1_depth_save_path = depth_save_path + '/camera1'
+    # os.mkdir(cam1_depth_save_path)
+    # cam2_depth_save_path = depth_save_path + '/camera2'
+    # os.mkdir(cam2_depth_save_path)
+    # cam3_depth_save_path = depth_save_path + '/camera3'
+    # os.mkdir(cam3_depth_save_path)
+    # cam4_depth_save_path = depth_save_path + '/camera4'
+    # os.mkdir(cam4_depth_save_path)
+    # cam5_depth_save_path = depth_save_path + '/camera5'
+    # os.mkdir(cam5_depth_save_path)
+
+
     W = 848
     H = 480
 
@@ -93,6 +125,7 @@ def vision_loop(fa, moving, filename):
     quaternions = []
 
     previous_time = time.time()
+    i = 0
 
     while moving.empty():
         # Camera 1
@@ -153,12 +186,19 @@ def vision_loop(fa, moving, filename):
         current_time = time.time()
         timestep = previous_time - current_time
 
+        # Save the Images
+        cv2.imwrite(cam1_image_save_path + '/img' + str(i) + '.png', color_image_1)
+        cv2.imwrite(cam2_image_save_path + '/img' + str(i) + '.png', color_image_2)
+        cv2.imwrite(cam3_image_save_path + '/img' + str(i) + '.png', color_image_3)
+        cv2.imwrite(cam4_image_save_path + '/img' + str(i) + '.png', color_image_4)
+        cv2.imwrite(cam5_image_save_path + '/img' + str(i) + '.png', color_image_5)
+        # cv2.imwrite(cam1_depth_save_path + '/img' + str(i) + '.png', depth_image_1)
+        # cv2.imwrite(cam2_depth_save_path + '/img' + str(i) + '.png', depth_image_2)
+        # cv2.imwrite(cam3_depth_save_path + '/img' + str(i) + '.png', depth_image_3)
+        # cv2.imwrite(cam4_depth_save_path + '/img' + str(i) + '.png', depth_image_4)
+        # cv2.imwrite(cam5_depth_save_path + '/img' + str(i) + '.png', depth_image_5)
+
         # Append the data
-        cam1_list.append(color_image_1)
-        cam2_list.append(color_image_2)
-        cam3_list.append(color_image_3)
-        cam4_list.append(color_image_4)
-        cam5_list.append(color_image_5)
         depth1_list.append(depth_image_1)
         depth2_list.append(depth_image_2)
         depth3_list.append(depth_image_3)
@@ -170,52 +210,118 @@ def vision_loop(fa, moving, filename):
         joint_angles.append(current_joints)
         rotation_matrices.append(current_pose.rotation)
         quaternions.append(current_pose.quaternion)
+
+
+
+
+
+        # # Append the data
+        # cam1_list.append(color_image_1)
+        # cam2_list.append(color_image_2)
+        # cam3_list.append(color_image_3)
+        # cam4_list.append(color_image_4)
+        # cam5_list.append(color_image_5)
+        # depth1_list.append(depth_image_1)
+        # depth2_list.append(depth_image_2)
+        # depth3_list.append(depth_image_3)
+        # depth4_list.append(depth_image_4)
+        # depth5_list.append(depth_image_5)
+        # timesteps.append(timestep)
+        # ee_position.append(current_pose.translation)
+        # ee_widths.append(gripper_width)
+        # joint_angles.append(current_joints)
+        # rotation_matrices.append(current_pose.rotation)
+        # quaternions.append(current_pose.quaternion)
+
+        # Save images to the folder in the order
+        # save the name + str(i)
         
         # print("got the images!")
-        time.sleep(0.5)
+        time.sleep(0.05)
         print("\nCurrent Pose: ", current_pose)
         previous_time = current_time
 
-        # NOTE: Alternate data storage structure
-            # filesystem that is .zip 
-            # Trajectory -> Timestep 1 -> Img1, Img2, ... , Gripper Width , ...
-            
-            # Data Format:
-                # /Trajectory [folder]
-                    # timesteps [array]
-                    # RGB Images [folder]
-                        # img 1 [.png]
-                    # Depth Images [folder]
-                        # img 1 [depth format]
-                    # ee positions [array]
-                    # ee widths [array]
-                    # joint angles [array]
-                    # rotation matrices [array]
-                    # quaternions [array]
+        i+=1
     
-    # save to .pkl file
-    traj_dict = {}
-    traj_dict["cam1_list"] = cam1_list
-    traj_dict["cam2_list"] = cam2_list
-    traj_dict["cam3_list"] = cam3_list
-    traj_dict["cam4_list"] = cam4_list
-    traj_dict["cam5_list"] = cam5_list
-    traj_dict["depth1_list"] = depth1_list
-    traj_dict["depth2_list"] = depth2_list
-    traj_dict["depth3_list"] = depth3_list
-    traj_dict["depth4_list"] = depth4_list
-    traj_dict["depth5_list"] = depth5_list
-    traj_dict["timesteps"] = timesteps
-    traj_dict["ee_position"] = ee_position
-    traj_dict["ee_widths"] = ee_widths
-    traj_dict["joint_angles"] = joint_angles
-    traj_dict["rotation_matrices"] = rotation_matrices
-    traj_dict["quaternions"] = quaternions
+    # Save the Data
+    with open(save_path + '/depth_cam1.pkl', 'wb') as pkl_f:
+        pkl.dump(depth1_list, pkl_f)
+    
+    with open(save_path + '/depth_cam2.pkl', 'wb') as pkl_f:
+        pkl.dump(depth2_list, pkl_f)
+    
+    with open(save_path + '/depth_cam3.pkl', 'wb') as pkl_f:
+        pkl.dump(depth3_list, pkl_f)
+    
+    with open(save_path + '/depth_cam4.pkl', 'wb') as pkl_f:
+        pkl.dump(depth4_list, pkl_f)
 
-    save_path = 'Dataset/' + filename
-    with open(save_path, 'wb') as pkl_f:
-        pkl.dump(traj_dict, pkl_f)
-        print("\n\nSaved the data!")
+    with open(save_path + '/depth_cam5.pkl', 'wb') as pkl_f:
+        pkl.dump(depth5_list, pkl_f)
+
+    with open(save_path + '/timestep.pkl', 'wb') as pkl_f:
+        pkl.dump(timesteps, pkl_f)
+
+    with open(save_path + '/ee_position.pkl', 'wb') as pkl_f:
+        pkl.dump(ee_position, pkl_f)
+    
+    with open(save_path + '/ee_widths.pkl', 'wb') as pkl_f:
+        pkl.dump(ee_widths, pkl_f)
+    
+    with open(save_path + '/joint_angles.pkl', 'wb') as pkl_f:
+        pkl.dump(joint_angles, pkl_f)
+    
+    with open(save_path + '/rotation_matrices.pkl', 'wb') as pkl_f:
+        pkl.dump(rotation_matrices, pkl_f)
+    
+    with open(save_path + '/quaternions.pkl', 'wb') as pkl_f:
+        pkl.dump(quaternions, pkl_f)
+
+
+
+    # Data Format:
+        # /Trajectory [folder]
+            # timesteps [array]
+            # RGB Images [folder]
+                # img 1 [.png]
+            # Depth Images [folder]
+                # img 1 [depth format]
+            # ee positions [array]
+            # ee widths [array]
+            # joint angles [array]
+            # rotation matrices [array]
+            # quaternions [array]
+    
+
+
+
+    # # save to .pkl file
+    # traj_dict = {}
+    # traj_dict["cam1_list"] = cam1_list
+    # traj_dict["cam2_list"] = cam2_list
+    # traj_dict["cam3_list"] = cam3_list
+    # traj_dict["cam4_list"] = cam4_list
+    # traj_dict["cam5_list"] = cam5_list
+    # traj_dict["depth1_list"] = depth1_list
+    # traj_dict["depth2_list"] = depth2_list
+    # traj_dict["depth3_list"] = depth3_list
+    # traj_dict["depth4_list"] = depth4_list
+    # traj_dict["depth5_list"] = depth5_list
+    # traj_dict["timesteps"] = timesteps
+    # traj_dict["ee_position"] = ee_position
+    # traj_dict["ee_widths"] = ee_widths
+    # traj_dict["joint_angles"] = joint_angles
+    # traj_dict["rotation_matrices"] = rotation_matrices
+    # traj_dict["quaternions"] = quaternions
+
+    # save_path = 'Dataset/' + filename
+    # with open(save_path, 'wb') as pkl_f:
+    #     pkl.dump(traj_dict, pkl_f)
+    #     print("\n\nSaved the data!")
+
+
+
+
 
     # # test the quality of the saved data
     # with open('Dataset/data_test.pkl', 'rb') as pkl_r:
@@ -276,8 +382,9 @@ if __name__ == "__main__":
     moving = queue.Queue()
 
     filename = 'data_test.pkl'
+    folder_name = 'Trajectory1'
 
-    vision = threading.Thread(target=vision_loop, args=(fa, moving, filename,))
+    vision = threading.Thread(target=vision_loop, args=(fa, moving, filename, folder_name,))
     action = threading.Thread(target=action_loop, args=(fa, moving,))
     vision.start()
     action.start()
