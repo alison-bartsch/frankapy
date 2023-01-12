@@ -15,7 +15,7 @@ Goal: record the robot's pose and all 5 camera's RGBD info at each timestep and 
 # THREAD 1: have the robot execute some arbitrary trajectory
 # THREAD 2: have the robot save the pose and RGBD information (perhaps point clouds too???? maybe too data hungy) every N seconds
 
-def vision_loop(fa, moving):
+def vision_loop(fa, moving, filename):
     W = 848
     H = 480
 
@@ -175,6 +175,23 @@ def vision_loop(fa, moving):
         time.sleep(0.5)
         print("\nCurrent Pose: ", current_pose)
         previous_time = current_time
+
+        # NOTE: Alternate data storage structure
+            # filesystem that is .zip 
+            # Trajectory -> Timestep 1 -> Img1, Img2, ... , Gripper Width , ...
+            
+            # Data Format:
+                # /Trajectory [folder]
+                    # timesteps [array]
+                    # RGB Images [folder]
+                        # img 1 [.png]
+                    # Depth Images [folder]
+                        # img 1 [depth format]
+                    # ee positions [array]
+                    # ee widths [array]
+                    # joint angles [array]
+                    # rotation matrices [array]
+                    # quaternions [array]
     
     # save to .pkl file
     traj_dict = {}
@@ -195,8 +212,8 @@ def vision_loop(fa, moving):
     traj_dict["rotation_matrices"] = rotation_matrices
     traj_dict["quaternions"] = quaternions
 
-
-    with open('Dataset/data_test.pkl', 'wb') as pkl_f:
+    save_path = 'Dataset/' + filename
+    with open(save_path, 'wb') as pkl_f:
         pkl.dump(traj_dict, pkl_f)
         print("\n\nSaved the data!")
 
@@ -258,7 +275,9 @@ if __name__ == "__main__":
 
     moving = queue.Queue()
 
-    vision = threading.Thread(target=vision_loop, args=(fa, moving,))
+    filename = 'data_test.pkl'
+
+    vision = threading.Thread(target=vision_loop, args=(fa, moving, filename,))
     action = threading.Thread(target=action_loop, args=(fa, moving,))
     vision.start()
     action.start()
