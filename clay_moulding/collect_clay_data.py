@@ -1,11 +1,7 @@
 import os
-import cv2
 import time
-import queue
 import random
-import threading
 import numpy as np
-import pickle as pkl
 import pyrealsense2 as rs
 from frankapy import FrankaArm
 from scipy.spatial.transform import Rotation
@@ -150,6 +146,7 @@ while True:
             color_frame_1 = frames_1.get_color_frame()
             depth_frame_1 = frames_1.get_depth_frame().as_depth_frame()
             color_image_1 = np.asanyarray(color_frame_1.get_data())
+            point_cloud_1.map_to(color_frame_1)
             points_1 = point_cloud_1.calculate(depth_frame_1)
             cam_1_save = state_save + '/pc1.ply'
             points_1.export_to_ply(cam_1_save, color_frame_1)
@@ -161,6 +158,7 @@ while True:
             depth_frame_2 = frames_2.get_depth_frame().as_depth_frame()
             color_image_2 = np.asanyarray(color_frame_2.get_data())
             depth_image_2 = np.asanyarray(depth_frame_2.get_data())
+            point_cloud_2.map_to(color_frame_2)
             points_2 = point_cloud_2.calculate(depth_frame_2)
             cam_2_save = state_save + '/pc2.ply'
             points_2.export_to_ply(cam_2_save, color_frame_2)
@@ -172,6 +170,7 @@ while True:
             depth_frame_3 = frames_3.get_depth_frame().as_depth_frame()
             color_image_3 = np.asanyarray(color_frame_3.get_data())
             depth_image_3 = np.asanyarray(depth_frame_3.get_data())
+            point_cloud_3.map_to(color_frame_3)
             points_3 = point_cloud_3.calculate(depth_frame_3)
             cam_3_save = state_save + '/pc3.ply'
             points_3.export_to_ply(cam_3_save, color_frame_3)
@@ -182,6 +181,7 @@ while True:
             color_frame_4 = frames_4.get_color_frame()
             depth_frame_4 = frames_4.get_depth_frame().as_depth_frame()
             color_image_4 = np.asanyarray(color_frame_4.get_data())
+            point_cloud_4.map_to(color_frame_4)
             points_4 = point_cloud_4.calculate(depth_frame_4)
             cam_4_save = state_save + '/pc4.ply'
             points_4.export_to_ply(cam_4_save, color_frame_4)
@@ -192,6 +192,7 @@ while True:
             color_frame_5 = frames_5.get_color_frame()
             depth_frame_5 = frames_5.get_depth_frame().as_depth_frame()
             color_image_5 = np.asanyarray(color_frame_5.get_data())
+            point_cloud_5.map_to(color_frame_5)
             points_5 = point_cloud_5.calculate(depth_frame_5)
             cam_5_save = state_save + '/pc5.ply'
             points_5.export_to_ply(cam_5_save, color_frame_5)
@@ -232,6 +233,7 @@ while True:
         color_frame_1 = frames_1.get_color_frame()
         depth_frame_1 = frames_1.get_depth_frame().as_depth_frame()
         color_image_1 = np.asanyarray(color_frame_1.get_data())
+        point_cloud_1.map_to(color_frame_1)
         points_1 = point_cloud_1.calculate(depth_frame_1)
         cam_1_save = state_save + '/pc1.ply'
         points_1.export_to_ply(cam_1_save, color_frame_1)
@@ -243,6 +245,7 @@ while True:
         depth_frame_2 = frames_2.get_depth_frame().as_depth_frame()
         color_image_2 = np.asanyarray(color_frame_2.get_data())
         depth_image_2 = np.asanyarray(depth_frame_2.get_data())
+        point_cloud_2.map_to(color_frame_2)
         points_2 = point_cloud_2.calculate(depth_frame_2)
         cam_2_save = state_save + '/pc2.ply'
         points_2.export_to_ply(cam_2_save, color_frame_2)
@@ -254,6 +257,7 @@ while True:
         depth_frame_3 = frames_3.get_depth_frame().as_depth_frame()
         color_image_3 = np.asanyarray(color_frame_3.get_data())
         depth_image_3 = np.asanyarray(depth_frame_3.get_data())
+        point_cloud_3.map_to(color_frame_3)
         points_3 = point_cloud_3.calculate(depth_frame_3)
         cam_3_save = state_save + '/pc3.ply'
         points_3.export_to_ply(cam_3_save, color_frame_3)
@@ -264,6 +268,7 @@ while True:
         color_frame_4 = frames_4.get_color_frame()
         depth_frame_4 = frames_4.get_depth_frame().as_depth_frame()
         color_image_4 = np.asanyarray(color_frame_4.get_data())
+        point_cloud_4.map_to(color_frame_4)
         points_4 = point_cloud_4.calculate(depth_frame_4)
         cam_4_save = state_save + '/pc4.ply'
         points_4.export_to_ply(cam_4_save, color_frame_4)
@@ -274,6 +279,7 @@ while True:
         color_frame_5 = frames_5.get_color_frame()
         depth_frame_5 = frames_5.get_depth_frame().as_depth_frame()
         color_image_5 = np.asanyarray(color_frame_5.get_data())
+        point_cloud_5.map_to(color_frame_5)
         points_5 = point_cloud_5.calculate(depth_frame_5)
         cam_5_save = state_save + '/pc5.ply'
         points_5.export_to_ply(cam_5_save, color_frame_5)
