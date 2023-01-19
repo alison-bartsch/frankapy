@@ -54,14 +54,14 @@ if __name__ == '__main__':
 	pose = fa.get_pose()
 	
 	# goto various arbitraty grasps
-	goto_grasp(fa, 0.69, 0, 0.25, 20, 15, 20, 0.01)
+	goto_grasp(fa, 0.69, 0, 0.22, 0, 0, 0, 0.01)
 	fa.open_gripper()
 	fa.goto_pose(overhead_pose)
 
-	goto_grasp(fa, 0.68, 0, 0.25, 0, 0, 0, 0.01)
+	goto_grasp(fa, 0.68, -0.05, 0.25, 0, 0, 0, 0.01)
 	fa.open_gripper()
 	fa.goto_pose(overhead_pose)
 
-	goto_grasp(fa, 0.65, 0, 0.25, 0, 0, 50, 0.04)
+	goto_grasp(fa, 0.65, 0.05, 0.25, 0, 0, 0, 0.04)
 	fa.open_gripper()
 	fa.goto_pose(overhead_pose)
