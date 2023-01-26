@@ -1,0 +1,41 @@
+sensors:
+  cam3:
+    extrinsics:
+      axis_angle:
+      - 0.0
+      - 0.0
+      - 0.0
+      translation:
+      - 0.0
+      - 0.0
+      - 0.0
+    intrinsics:
+      parameters:
+        cx: 422.9867344723377
+        cy: 286.7676355759115
+        fx: 586.8240406986716
+        fy: 620.0079907982265
+        image_size:
+        - 848
+        - 480
+      type: Pinhole
+  cam5:
+    extrinsics:
+      axis_angle:
+      - -0.05141794414638882
+      - -2.565324832444076
+      - -1.629940192975104
+      translation:
+      - 0.15007217720795157
+      - -0.44215392491334865
+      - 0.6811412885118099
+    intrinsics:
+      parameters:
+        cx: 409.26572027374243
+        cy: 246.7050614350205
+        fx: 603.3991777534334
+        fy: 602.176189096831
+        image_size:
+        - 848
+        - 480
+      type: Pinhole

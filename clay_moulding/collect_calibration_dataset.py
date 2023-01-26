@@ -1,9 +1,6 @@
 import cv2
-
 import numpy as np
 import pyrealsense2 as rs
-
-
 
 W = 848
 H = 480
@@ -58,16 +55,15 @@ aligned_stream_4 = rs.align(rs.stream.color)
 aligned_stream_5 = rs.align(rs.stream.color)
 
 i = 0
-while i < 50:
-# for i in range(50):
-    # Camera 2
-    frames_2 = pipeline_2.wait_for_frames()
-    frames_2 = aligned_stream_2.process(frames_2)
-    color_frame_2 = frames_2.get_color_frame()
-    depth_frame_2 = frames_2.get_depth_frame().as_depth_frame()
-    color_image_2 = np.asanyarray(color_frame_2.get_data())
-    cv2.imshow("Cam 2", color_image_2)
-    
+while i < 51:
+
+    # # Camera 2
+    # frames_2 = pipeline_2.wait_for_frames()
+    # frames_2 = aligned_stream_2.process(frames_2)
+    # color_frame_2 = frames_2.get_color_frame()
+    # depth_frame_2 = frames_2.get_depth_frame().as_depth_frame()
+    # color_image_2 = np.asanyarray(color_frame_2.get_data())
+    # cv2.imshow("Cam 2", color_image_2)
 
     # Camera 3
     frames_3 = pipeline_3.wait_for_frames()
@@ -77,13 +73,13 @@ while i < 50:
     color_image_3 = np.asanyarray(color_frame_3.get_data())
     cv2.imshow("Cam 3", color_image_3)
 
-    # Camera 4
-    frames_4 = pipeline_4.wait_for_frames()
-    frames_4 = aligned_stream_4.process(frames_4)
-    color_frame_4 = frames_4.get_color_frame()
-    depth_frame_4 = frames_4.get_depth_frame().as_depth_frame()
-    color_image_4 = np.asanyarray(color_frame_4.get_data())
-    cv2.imshow("Cam 4", color_image_4)
+    # # Camera 4
+    # frames_4 = pipeline_4.wait_for_frames()                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
+    # frames_4 = aligned_stream_4.process(frames_4)
+    # color_frame_4 = frames_4.get_color_frame()
+    # depth_frame_4 = frames_4.get_depth_frame().as_depth_frame()
+    # color_image_4 = np.asanyarray(color_frame_4.get_data())
+    # cv2.imshow("Cam 4", color_image_4)
 
     # Camera 5
     frames_5 = pipeline_5.wait_for_frames()
@@ -92,16 +88,14 @@ while i < 50:
     depth_frame_5 = frames_5.get_depth_frame().as_depth_frame()
     color_image_5 = np.asanyarray(color_frame_5.get_data())
     cv2.imshow("Cam 5", color_image_5)
+
+
     cv2.waitKey(1)
 
-    # user_input = input("\nHit p to capture another picture")
-
-    # # if hit enter, capture a picture
-    # # if user_input == 'p':
 
     input("\nHit enter to capture another picture")
-    cv2.imwrite('Calibration_Dataset/cam2/' + str(i) + '.jpg', color_image_2)
-    cv2.imwrite('Calibration_Dataset/cam3/' + str(i) + '.jpg', color_image_3)
-    cv2.imwrite('Calibration_Dataset/cam4/' + str(i) + '.jpg', color_image_4)
-    cv2.imwrite('Calibration_Dataset/cam5/' + str(i) + '.jpg', color_image_5)
+    # cv2.imwrite('Calibration_Dataset/cam2/' + str(i) + '.png', color_image_2)
+    cv2.imwrite('Calibration_Dataset/cam3/' + str(i) + '.png', color_image_3)
+    # cv2.imwrite('Calibration_Dataset/cam4/' + str(i) + '.png', color_image_4)
+    cv2.imwrite('Calibration_Dataset/cam5/' + str(i) + '.png', color_image_5)
     i+=1
