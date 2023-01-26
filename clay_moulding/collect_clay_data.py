@@ -207,8 +207,8 @@ while True:
         x = round(random.uniform(0.6, 0.7), 2)
         y = round(random.uniform(-0.03, 0.03), 2)
         z = round(random.uniform(0.22, 0.27), 2)
-        rx = random.randint(-50, 50)
-        ry = random.randint(-50, 50)
+        rx = random.randint(-30, 30) # original: -50, 50
+        ry = random.randint(-30, 30) # original: -50, 50
         rz = random.randint(-90, 90)
         d = round(random.uniform(0.005, 0.075), 3)
 

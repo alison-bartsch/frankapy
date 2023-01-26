@@ -3,20 +3,61 @@ import open3d as o3d
 import pyrealsense2 as rs
 
 if __name__ == "__main__":
-    file_path = 'Dataset/Trajectory0/State0/pc4.ply'
-    # file_path = 'Dataset/Test_Save_Formats/test9.ply'
+    pc1_path = 'Dataset/Trajectory0/State0/pc1.ply'
+    pc2_path = 'Dataset/Trajectory3/State0/pc2.ply'
+    pc3_path = 'Dataset/Trajectory0/State0/pc3.ply'
+    pc4_path = 'Dataset/Trajectory0/State0/pc4.ply'
+    pc5_path = 'Dataset/Trajectory0/State0/pc5.ply'
 
     # visualize
     print("\nloading point cloud and render...")
-    pointcloud = o3d.io.read_point_cloud(file_path)
+    pointcloud = o3d.io.read_point_cloud(pc2_path)
     print(pointcloud)
-    print(np.asarray(pointcloud.points))
+    print("\nPoints: ", pointcloud.points)
+    print("\nColors: ", pointcloud.colors)
     o3d.visualization.draw_geometries([pointcloud])
 
-    # downsample
-    print("\ndownsample...")
+    # statistical outlier removal
     cl, ind = pointcloud.remove_statistical_outlier(nb_neighbors=20, std_ratio=2.0)
     o3d.visualization.draw_geometries([cl])
+
+    # remove points outside of sphere
+    center = np.array([0, 0, 0])
+    radius = 0.9
+    points = np.asarray(pointcloud.points)
+    colors = np.asarray(pointcloud.colors)
+    distances = np.linalg.norm(points - center, axis=1)
+    print("\nDistances Length: ", distances.shape)
+    print("\nPointcloud Length: ", len(np.asarray(pointcloud.points)))
+    indices = np.where(distances <= radius)
+    pointcloud.points = o3d.utility.Vector3dVector(points[indices])
+    pointcloud.colors = o3d.utility.Vector3dVector(colors[indices])
+
+    o3d.visualization.draw_geometries([pointcloud])
+
+
+    # downsampling
+    down_pointcloud = pointcloud.voxel_down_sample(voxel_size=0.005)
+    o3d.visualization.draw_geometries([down_pointcloud])
+
+
+    
+    # # crop pointcloud
+    # min_bound = np.array([-0.9, -0.9, -0.9])
+    # max_bound = np.array([0.9, 0.9, 0.9])
+    # cropped = o3d.geometry.crop_point_cloud(pointcloud, min_bound, max_bound)
+    # o3d.visualization.draw_geometries([cropped])
+
+
+
+
+    # # downsample
+    # print("\ndownsample...")
+    # cl, ind = pointcloud.remove_statistical_outlier(nb_neighbors=20, std_ratio=2.0)
+    # o3d.visualization.draw_geometries([cl])
+
+
+
 
 
 

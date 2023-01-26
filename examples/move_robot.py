@@ -2,6 +2,7 @@ import numpy as np
 from autolab_core import RigidTransform
 
 from frankapy import FrankaArm
+import time
 
 
 if __name__ == "__main__":
@@ -23,64 +24,80 @@ if __name__ == "__main__":
     gripper_width = fa.get_gripper_width()
     print('Gripper width: {}'.format(gripper_width))
 
-    # gripper controls
-    print('Closing gripper')
-    fa.close_gripper()
-    gripper_width = fa.get_gripper_width()
-    print('Gripper width: {}'.format(gripper_width))
 
-    print('Opening gripper to a specified position')
-    fa.goto_gripper(0.04)
-    gripper_width = fa.get_gripper_width()
-    print('Gripper width: {}'.format(gripper_width))
+    # move forward
+    T_ee_world = fa.get_pose()
+    T_ee_world.translation = np.array([0.55, 0, 0.4])
+    fa.goto_pose(T_ee_world)
 
-    print('Opening gripper all the way')
+    fa.goto_gripper(0.038)
+
+    T_ee_world.translation = np.array([0.55, -0.1, 0.4])
+    fa.goto_pose(T_ee_world)
+
     fa.open_gripper()
-    gripper_width = fa.get_gripper_width()
-    print('Gripper width: {}'.format(gripper_width))
 
-    # move to center
-    T_ee_world = fa.get_pose()
-    T_ee_world.translation += [0.4, 0, 0.1]
-    fa.goto_pose(T_ee_world)
-
-    # move to negative y
-    T_ee_world = fa.get_pose()
-    T_ee_world.translation += [0, -0.1, 0]
-    fa.goto_pose(T_ee_world)
-    new_pose = fa.get_pose()
-    print("\nPose: ", new_pose)
-
-    # reset robot
-    fa.reset_pose()
+    time.sleep(2)
     fa.reset_joints()
 
-    assert False
+    # # gripper controls
+    # print('Closing gripper')
+    # time.sleep(2)
+    # fa.close_gripper()
+    # gripper_width = fa.get_gripper_width()
+    # print('Gripper width: {}'.format(gripper_width))
 
-    # joint controls
-    print('\nRotating last joint')
-    joints = fa.get_joints()
-    joints[6] += np.deg2rad(20)
-    fa.goto_joints(joints)
-    joints[6] -= np.deg2rad(20)
-    fa.goto_joints(joints)
+    # # print('Opening gripper to a specified position')
+    # # fa.goto_gripper(0.04)
+    # # gripper_width = fa.get_gripper_width()
+    # # print('Gripper width: {}'.format(gripper_width))
 
-    print('\nRotating wrist joint')
-    joints = fa.get_joints()
-    joints[5] += np.deg2rad(10)
-    fa.goto_joints(joints)
-    joints[5] -= np.deg2rad(10)
-    fa.goto_joints(joints)
+    # # move forward
+    # T_ee_world = fa.get_pose()
+    # T_ee_world.translation = np.array([0.4, 0.1, 0.35])
+    # fa.goto_pose(T_ee_world)
 
-    # end-effector pose control
-    print('\nTranslation')
-    T_ee_world = fa.get_pose()
-    print('EE World: ', T_ee_world)
-    T_ee_world.translation += [0.1, 0, 0.1]
-    fa.goto_pose(T_ee_world)
-    print('EE World: ', fa.get_pose())
-    T_ee_world.translation -= [0.1, 0, 0.1]
-    fa.goto_pose(T_ee_world)
+    # print('Opening gripper all the way')
+    # fa.open_gripper()
+    # gripper_width = fa.get_gripper_width()
+    # print('Gripper width: {}'.format(gripper_width))
+
+
+    # # reset robot
+    # fa.reset_pose()
+    # fa.reset_joints()
+
+
+
+
+
+
+    # assert False
+
+    # # joint controls
+    # print('\nRotating last joint')
+    # joints = fa.get_joints()
+    # joints[6] += np.deg2rad(20)
+    # fa.goto_joints(joints)
+    # joints[6] -= np.deg2rad(20)
+    # fa.goto_joints(joints)
+
+    # print('\nRotating wrist joint')
+    # joints = fa.get_joints()
+    # joints[5] += np.deg2rad(10)
+    # fa.goto_joints(joints)
+    # joints[5] -= np.deg2rad(10)
+    # fa.goto_joints(joints)
+
+    # # end-effector pose control
+    # print('\nTranslation')
+    # T_ee_world = fa.get_pose()
+    # print('EE World: ', T_ee_world)
+    # T_ee_world.translation += [0.1, 0, 0.1]
+    # fa.goto_pose(T_ee_world)
+    # print('EE World: ', fa.get_pose())
+    # T_ee_world.translation -= [0.1, 0, 0.1]
+    # fa.goto_pose(T_ee_world)
 
     # print('\nRotation in end-effector frame')
     # T_ee_rot = RigidTransform(
