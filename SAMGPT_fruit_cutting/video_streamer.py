@@ -28,7 +28,12 @@ pipeline.start(config)
 aligned_stream = rs.align(rs.stream.color)
 
 # Create a window to display the video
-cv2.namedWindow('Color Stream', cv2.WINDOW_AUTOSIZE)
+cv2.namedWindow('Video Stream', cv2.WINDOW_AUTOSIZE)
+
+# Define the codec and create a VideoWriter object
+fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+output_path = os.path.join(os.path.expanduser('~'), 'cam_2_video.mp4')
+out = cv2.VideoWriter(output_path, fourcc, 30, (W, H))
 
 start_time = time.time()
 
@@ -39,10 +44,14 @@ while time.time() - start_time < video_duration:
     color_frame = frames.get_color_frame()
     color_image = np.asanyarray(color_frame.get_data())
 
+    # Write the color frame to the video file
+    out.write(color_image)
+
     # Display the color frame
     cv2.imshow('Color Stream', color_image)
     cv2.waitKey(1)
 
 # Release resources and close the window
+out.release()
 pipeline.stop()
 cv2.destroyAllWindows()
