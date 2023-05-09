@@ -48,7 +48,7 @@ while time.time() - start_time < video_duration:
     out.write(color_image)
 
     # Display the color frame
-    cv2.imshow('Color Stream', color_image)
+    cv2.imshow('Video Stream', color_image)
     cv2.waitKey(1)
 
 # Release resources and close the window
