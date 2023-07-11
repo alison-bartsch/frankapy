@@ -36,12 +36,13 @@ if __name__ == "__main__":
     # fa.goto_pose(pose)
 
     fourcc = cv2.VideoWriter_fourcc(*'XVID') 
+    fourcc_d = cv2.VideoWriter_fourcc(*'XVID') 
     color_filename = 'data_color.avi' 
     depth_filename = 'data_depth.avi' 
     output_fps = 30.0  # Frames per second
     output_size = (W, H) 
     color_video = cv2.VideoWriter(color_filename, fourcc, output_fps, output_size)
-    depth_video = cv2.VideoWriter(depth_filename, fourcc, output_fps, output_size)
+    depth_video = cv2.VideoWriter(depth_filename, fourcc_d, output_fps, output_size)
 
 
     # for i in range(650):
@@ -60,7 +61,7 @@ if __name__ == "__main__":
         depths = np.clip(depth_image_1, 0, 1500)
         # depth_image_1 = np.uint16(depths)*255.0/1500.0
         depth_image_1 = (depths * 255.0 / 1500.0).astype(np.uint8)
-        
+        depth_image_1 = cv2.cvtColor(depth_image_1, cv2.COLOR_GRAY2BGR)
         
         
         # Show the images
@@ -75,13 +76,14 @@ if __name__ == "__main__":
             break
         elif k== ord('s'):
             print("Saving....")
+
             # Save the image
-            cam1_filename_c = "/socket_Imgs/color/" + str(i) + "_cam1.jpg"
-            cam1_filename_d = "/socket_Imgs/depth/" + str(i) + "_cam1.png"
+            cam1_filename_c = str(i) + "_cam1.jpg"
+            cam1_filename_d = str(i) + "_cam1.png"
             
             print(np.unique((depth_image_1/255.0)*1500*ds1))
             # print(np.unique(depth_colormap))
-            
+            print(np.unique(depth_image_1))
             cv2.imwrite(cam1_filename_c, color_image_1)
             cv2.imwrite(cam1_filename_d, depth_image_1)
             i += 1

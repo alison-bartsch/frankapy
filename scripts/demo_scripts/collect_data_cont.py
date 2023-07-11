@@ -23,7 +23,7 @@ if __name__ == "__main__":
     
     # reset franka to its home joints
     fa.close_gripper()
-    fa.reset_pose()
+    # fa.reset_pose()
     fa.reset_joints()
     # pose = fa.get_pose()
     # print("\nRobot Pose: ", pose)
@@ -74,19 +74,20 @@ if __name__ == "__main__":
         #     cv2.imwrite(cam1_filename_d, depth_image_1)
         #     i += 1
             
-    z_positions = [0.1, 0.2, 0.3, 0.4, 0.4, 0.5, 0.6]
-    x_positions = [0.4, 0.5, 0.6, 0.7, 0.8]
+    z_positions = [0.1, 0.2, 0.3, 0.4, 0.4, 0.5]
+    x_positions = [0.4, 0.5, 0.6, 0.7]
     y_positions = [-0.15, -0.1, 0, 0.1, 0.15]
+    T_ee_world = fa.get_pose()
     for z in z_positions:
         for x in x_positions:
             for y in y_positions:
-                T_ee_world = fa.get_pose()
+                
                 # print('Current pose: ', T_ee_world)
                 T_ee_world.translation = np.array([x, y, z])
                 fa.goto_pose(T_ee_world, block = True)
                 print('New pose: ', fa.get_pose())
                 fa.wait_for_skill()
-            
+    fa.reset_joints()  
         # elif k == ord('y'):
         #     T_ee_world = fa.get_pose()
         #     print('Current pose: ', T_ee_world)
