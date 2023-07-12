@@ -47,6 +47,8 @@ if __name__ == "__main__":
     pose.translation = np.array([0.4, 0, 0.1])
     fa.goto_pose(pose, block=True)
     print("\nRobot Pose: ", pose.rotation)
+
+    
     rotation = random_rotation_matrix()
     rotated_translation = (rotation@np.array([[0], [0], [-0.25]])).flatten()
     # rotated_translation[0] *= -1
