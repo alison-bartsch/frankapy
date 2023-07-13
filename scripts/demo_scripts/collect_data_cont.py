@@ -18,9 +18,9 @@ REALSENSE_TF_CAM_1 = "calib/realsense_ee.tf"
 
 def random_rotation_matrix():
     fconst = FrankaConstants()
-    theta = np.random.uniform(0, np.pi/4.)  # Rotation around z-axis
-    phi = np.random.uniform(0, np.pi/4.)    # Rotation around y-axis
-    psi = np.random.uniform(0, np.pi/4.)    # Rotation around x-axis
+    theta = np.random.uniform(0, np.pi/6.)  # Rotation around z-axis
+    phi = np.random.uniform(0, np.pi/6.)    # Rotation around y-axis
+    psi = np.random.uniform(0, np.pi/6.)    # Rotation around x-axis
     print(theta*180/np.pi, phi*180/np.pi, psi*180/np.pi)
 
     # psi = 0.1
@@ -45,6 +45,20 @@ def random_rotation_matrix():
 
     return rotation_matrix
 
+def check_pose(position):
+    if np.any([position<= fconst.WORKSPACE_WALLS[:, :3].min(axis=0) +0.01,
+        pose.translation >= fconst.WORKSPACE_WALLS[:, :3].max(axis=0) - 0.01]):
+        print('colide with pose')
+        return False
+        
+    # if np.any([position + top_offset <= fconst.WORKSPACE_WALLS[:, :3].min(axis=0) +0.01,
+    #     pose.translation + top_offset >= fconst.WORKSPACE_WALLS[:, :3].max(axis=0) - 0.01]): #fa.is_joints_in_collision_with_boxes(): #Function inside Franka Arm
+    #     print("colide with top")
+    #     return False
+    return True
+
+    
+            
 
 if __name__ == "__main__":
 
@@ -59,34 +73,61 @@ if __name__ == "__main__":
     pose.translation = np.array([0.4, 0, 0.1])
     fa.goto_pose(pose, block=True)
 
-    i = 0
     
     # z_positions = [0.1, 0.2, 0.3, 0.4, 0.4, 0.5]
     # x_positions = [0.4, 0.5, 0.6, 0.7]
     # y_positions = [-0.15, -0.1, 0, 0.1, 0.15]
 
-    z_positions = [-0.1, 0.1]
-    x_positions = [-0.1, 0.1]
-    y_positions = [-0.1, 0.1]
+    # z_positions = [-0.1, 0.1]
+    # x_positions = [-0.1, 0.1]
+    # y_positions = [-0.1, 0.1]
+    z_positions = [-0.05, 0.05]
+    x_positions = [-0.05, 0.05]
+    y_positions = [-0.05, 0.05]
     for i in range(10):
 
         rotation = random_rotation_matrix()
         rotated_translation = (rotation@np.array([[0], [0], [-0.25]])).flatten()
-        pose.translation = rotated_translation + np.array([0.4, 0, 0.04])
+        top_offset = (rotation@np.array([[0], [0], [-0.3]])).flatten()
+        center_pose = rotated_translation + np.array([0.4, 0, 0.04]) #pose.translation 
+        pose.translation = center_pose
+        if not check_pose(pose.translation):
+            continue
+        if not check_pose(pose.translation + top_offset):
+            continue
+        # if np.any([pose.translation <= fconst.WORKSPACE_WALLS[:, :3].min(axis=0) +0.01,
+        #     pose.translation >= fconst.WORKSPACE_WALLS[:, :3].max(axis=0) - 0.01]):
+        #     print('colide with pose')
+ 
+        # if np.any([pose.translation + top_offset <= fconst.WORKSPACE_WALLS[:, :3].min(axis=0) +0.01,
+        #     pose.translation + top_offset >= fconst.WORKSPACE_WALLS[:, :3].max(axis=0) - 0.01]): #fa.is_joints_in_collision_with_boxes(): #Function inside Franka Arm
+        #     print("colide with top")
+        #     continue
         pose.rotation = rotation
+        fa.goto_pose(pose, block = True)
+        
         # fa.goto_pose(pose)
         for z in z_positions:
             for x in x_positions:
                 for y in y_positions:
 
                     # print('Current pose: ', T_ee_world)
-                    pose.translation += np.array([x, y, z])
-                    TransMatrix = np.vstack((np.hstack((pose.rotation, pose.translation[:, None])), [0, 0, 0 ,1]))
-                    if fa.is_joints_in_collision_with_boxes(): #Function inside Franka Arm
+                    pose.translation = np.array([x, y, z]) + center_pose
+                    print("translation pose: ",pose.translation)
+                    
+                    if np.any([pose.translation <= fconst.WORKSPACE_WALLS[:, :3].min(axis=0) +0.01,
+                        pose.translation >= fconst.WORKSPACE_WALLS[:, :3].max(axis=0) - 0.01]):
+                        print('colide with pose')
                         continue
+
+                    if np.any([pose.translation + top_offset <= fconst.WORKSPACE_WALLS[:, :3].min(axis=0) +0.01,
+                        pose.translation + top_offset >= fconst.WORKSPACE_WALLS[:, :3].max(axis=0) - 0.01]): #fa.is_joints_in_collision_with_boxes(): #Function inside Franka Arm
+                        print("colide with top")
+                        continue
+
                     fa.goto_pose(pose, block = True)
                     print('New pose: ', fa.get_pose())
-                    fa.wait_for_skill()
+                    # fa.wait_for_skill()
         fa.reset_joints()  
         print("\nRobot Pose: ", pose.rotation)
         print("Done")
