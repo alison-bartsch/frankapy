@@ -81,7 +81,7 @@ if __name__ == "__main__":
     # z_positions = [-0.1, 0.1]
     # x_positions = [-0.1, 0.1]
     # y_positions = [-0.1, 0.1]
-    z_positions = [-0.05, 0.05]
+    z_positions = [-0.1, 0.1]
     x_positions = [-0.05, 0.05]
     y_positions = [-0.05, 0.05]
     for i in range(10):
