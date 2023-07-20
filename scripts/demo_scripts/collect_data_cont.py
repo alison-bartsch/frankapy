@@ -87,7 +87,7 @@ if __name__ == "__main__":
     for i in range(10):
 
         rotation = random_rotation_matrix()
-        rotated_translation = (rotation@np.array([[0], [0], [-0.25]])).flatten()
+        rotated_translation = (rotation@np.array([[0], [0], [-0.35]])).flatten()
         top_offset = (rotation@np.array([[0], [0], [-0.3]])).flatten()
         center_pose = rotated_translation + np.array([0.4, 0, 0.04]) #pose.translation 
         pose.translation = center_pose

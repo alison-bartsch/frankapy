@@ -101,33 +101,24 @@ if __name__ == "__main__":
             break
         elif k== ord('s'):
             print("Saving....")
-            pcd = o3d.geometry.PointCloud()
-            pcd.points = o3d.utility.Vector3dVector(verts.reshape(-1, 3))
-            o3d.io.write_point_cloud("data.ply", pcd)
-            # # ply = rs.save_to_ply("pcd.ply")
-            pcd_load = o3d.io.read_point_cloud("data.ply")
-            uni_down_pcd = pcd.uniform_down_sample(every_k_points=20)
-            # o3d.visualization.draw_geometries([pcd_load])
-            o3d.visualization.draw_geometries([uni_down_pcd])
-            cl, ind = uni_down_pcd.remove_statistical_outlier(nb_neighbors=500,
-                                                    std_ratio=1.0)
-            o3d.visualization.draw_geometries([uni_down_pcd.select_by_index(ind)])
-            print(len(pcd_load.points),len(uni_down_pcd.points),len(uni_down_pcd.select_by_index(ind).points))
             
+            cam = o3d.camera.PinholeCameraIntrinsic(W, H, 621.70715, 621.9764, 323.3644, 244.8789)
+            color_image = o3d.geometry.Image(color_image_1)
+            depth_image = o3d.geometry.Image(depths)
+            rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
+                        color_image,
+                        depth_image,
+                        depth_scale=1.0 / ds1,
+                        depth_trunc= 1,
+                        convert_rgb_to_intensity=False)
+            temp = o3d.geometry.PointCloud.create_from_rgbd_image(
+                        rgbd_image, cam)
+            # temp = temp.uniform_down_sample(every_k_points=5)
+            cl, ind = temp.remove_statistical_outlier(nb_neighbors=200,
+                                                            std_ratio=1.0)
+            # o3d.visualization.draw_geometries([temp])
+            o3d.visualization.draw_geometries([temp.select_by_index(ind)])
             
-            # depth_image = o3d.geometry.Image(
-            #     np.array(depth_frame_1.get_data()))
-            # color_temp = np.asarray(color_frame_1.get_data())
-            # color_image = o3d.geometry.Image(color_temp)
-
-            # rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
-            #     color_image,
-            #     depth_image,
-            #     depth_scale=1.0 / ds1,
-            #     depth_trunc=1.5,
-            #     convert_rgb_to_intensity=False)
-            # temp = o3d.geometry.PointCloud.create_from_rgbd_image(
-            #     rgbd_image, out)
         #     # Save the image
         #     cam1_filename_c = "/socket_Imgs/color/" + str(i) + "_cam1.jpg"
         #     cam1_filename_d = "/socket_Imgs/depth/" + str(i) + "_cam1.png"
