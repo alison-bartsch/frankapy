@@ -14,6 +14,9 @@ for each camera.
 W = 848
 H = 480
 
+
+
+
 # ----- Camera 1 (end-effector) -----
 REALSENSE_INTRINSICS_CAM_1 = "calib/realsense_intrinsics.intr"
 REALSENSE_TF_CAM_1 = "calib/realsense_ee_orginal.tf"
@@ -56,11 +59,19 @@ if __name__ == "__main__":
     # for i in range(650):
     cv2.namedWindow('My Window')
     image = 255*np.ones((H, W, 3), dtype=np.uint8)
+    
+    
     i = 0
     while(True):
         # Camera 1
         frames_1 = pipeline_1.wait_for_frames()
         frames_1 = aligned_stream_1.process(frames_1)
+        if i == 0:
+            intrinsics = frames_1.profile.as_video_stream_profile().intrinsics
+            out = o3d.camera.PinholeCameraIntrinsic(848, 480, intrinsics.fx,
+                                                    intrinsics.fy, intrinsics.ppx,
+                                                    intrinsics.ppy)
+            i += 1
         color_frame_1 = frames_1.get_color_frame()
         color_image_1 = np.asanyarray(color_frame_1.get_data())
         point_cloud.map_to(color_frame_1)
@@ -102,6 +113,21 @@ if __name__ == "__main__":
                                                     std_ratio=1.0)
             o3d.visualization.draw_geometries([uni_down_pcd.select_by_index(ind)])
             print(len(pcd_load.points),len(uni_down_pcd.points),len(uni_down_pcd.select_by_index(ind).points))
+            
+            
+            # depth_image = o3d.geometry.Image(
+            #     np.array(depth_frame_1.get_data()))
+            # color_temp = np.asarray(color_frame_1.get_data())
+            # color_image = o3d.geometry.Image(color_temp)
+
+            # rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
+            #     color_image,
+            #     depth_image,
+            #     depth_scale=1.0 / ds1,
+            #     depth_trunc=1.5,
+            #     convert_rgb_to_intensity=False)
+            # temp = o3d.geometry.PointCloud.create_from_rgbd_image(
+            #     rgbd_image, out)
         #     # Save the image
         #     cam1_filename_c = "/socket_Imgs/color/" + str(i) + "_cam1.jpg"
         #     cam1_filename_d = "/socket_Imgs/depth/" + str(i) + "_cam1.png"

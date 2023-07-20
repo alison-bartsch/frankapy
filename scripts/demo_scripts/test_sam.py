@@ -98,7 +98,7 @@ if __name__ == '__main__':
     #    sam_checkpoint = "sam_vit_h_4b8939.pth"
 
     # Load the video
-    video_name = 'data_color.avi'
+    video_name = 'videos/data_color.avi'
     video_path = os.path.join('', video_name) # Load the appropriate video path 
     if os.path.isfile(video_path):
         print("Video file exists!")
