@@ -57,8 +57,8 @@ if __name__ == "__main__":
 
 
     # for i in range(650):
-    cv2.namedWindow('My Window')
-    image = 255*np.ones((H, W, 3), dtype=np.uint8)
+    # cv2.namedWindow('My Window')
+    # image = 255*np.ones((H, W, 3), dtype=np.uint8)
     
     
     i = 0
@@ -75,7 +75,7 @@ if __name__ == "__main__":
         color_frame_1 = frames_1.get_color_frame()
         color_image_1 = np.asanyarray(color_frame_1.get_data())
         point_cloud.map_to(color_frame_1)
-        
+        color_image_1 = cv2.rectangle(color_image_1, (420,125),(540,180), color=(0,255,255), thickness= 2)
         depth_frame_1 = frames_1.get_depth_frame().as_depth_frame()
         depth_image_1 = np.asanyarray(depth_frame_1.get_data())
         depth_colormap = np.asanyarray(colorizer.colorize(depth_frame_1).get_data())
@@ -99,12 +99,41 @@ if __name__ == "__main__":
         k = cv2.waitKey(1)
         if k==27:
             break
+        elif k == ord('p'):
+            pose = fa.get_pose()
+            print(pose.rotation)
+            print(pose.translation)
+            t1 = np.eye(4)
+            t1[:3,:3] = pose.rotation
+            t1[:3,3] = pose.translation
+            print(t1)
+            print(transform)
+            t2 = np.eye(4)
+            t2[:3,:3] = transform.rotation
+            t2[:3,3] = transform.translation
+            print(t2)
+
         elif k== ord('s'):
-            print("Saving....")
-            
+            # print("Saving....")
+            # pose = fa.get_pose()
+            # t1 = np.eye(4)
+            # t1[:3,:3] = pose.rotation
+            # t1[:3,3] = pose.translation
+            # t2 = np.eye(4)
+            # t2[:3,:3] = transform.rotation
+            # t2[:3,3] = transform.translation
             cam = o3d.camera.PinholeCameraIntrinsic(W, H, 621.70715, 621.9764, 323.3644, 244.8789)
+            # (420,125),(540,180)
+            depths[:125,:] = 0
+            depths[180:,:] = 0
+            depths[:,:420] = 0
+            depths[:,540:] = 0
             color_image = o3d.geometry.Image(color_image_1)
+            # depths = np.zeros_like(depths)
             depth_image = o3d.geometry.Image(depths)
+            # print(depths[420:540, 125:180])
+            print(depths.shape)
+            
             rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
                         color_image,
                         depth_image,
@@ -118,6 +147,9 @@ if __name__ == "__main__":
                                                             std_ratio=1.0)
             # o3d.visualization.draw_geometries([temp])
             o3d.visualization.draw_geometries([temp.select_by_index(ind)])
+            
+
+            # the bounding box coordinates of the ROI
             
         #     # Save the image
         #     cam1_filename_c = "/socket_Imgs/color/" + str(i) + "_cam1.jpg"
