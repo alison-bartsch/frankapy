@@ -48,6 +48,7 @@ if __name__ == "__main__":
     # for i in range(650):
     
     i = 0
+    depth_matrices = []
     while(True):
         # Camera 1
         frames_1 = pipeline_1.wait_for_frames()
@@ -59,6 +60,7 @@ if __name__ == "__main__":
         depth_image_1 = np.asanyarray(depth_frame_1.get_data())
         depth_colormap = np.asanyarray(colorizer.colorize(depth_frame_1).get_data())
         depths = np.clip(depth_image_1, 0, 1500)
+        depth_matrices.append(depths)
         # depth_image_1 = np.uint16(depths)*255.0/1500.0
         depth_image_1 = (depths * 255.0 / 1500.0).astype(np.uint8)
         depth_image_1 = cv2.cvtColor(depth_image_1, cv2.COLOR_GRAY2BGR)
@@ -90,6 +92,7 @@ if __name__ == "__main__":
             
      
         
-            
+    np.save('depth_data.npy', np.array(depth_matrices))
+    print("Size of depth matrices:", len(depth_matrices))    
             
     cv2.destroyAllWindows()

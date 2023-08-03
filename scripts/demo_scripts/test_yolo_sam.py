@@ -25,7 +25,7 @@ else:
     quit()
 
 SAM = True
-OPEN3D = False
+OPEN3D = True
 
 model = YOLO(model_path_YOLO) 
 model.to(device)
