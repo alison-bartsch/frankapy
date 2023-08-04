@@ -8,6 +8,12 @@ import time
 import os
 import open3d as o3d
 import warnings 
+from scipy.ndimage import gaussian_filter
+import time 
+
+W = 848
+H = 480
+
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
@@ -25,7 +31,7 @@ else:
     quit()
 
 SAM = True
-OPEN3D = True
+OPEN3D = False
 
 model = YOLO(model_path_YOLO) 
 model.to(device)
@@ -63,8 +69,12 @@ output_path = 'output_video.avi'
 output_size = (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
 out = cv2.VideoWriter(output_path, cv2.VideoWriter_fourcc(*'XVID'), fps, output_size)
 
+depth_data =np.load("depth_data.npy")
+print(depth_data.shape)
 
+frame_count = 0
 while cap.isOpened():
+    start = time.time()
     ret, color = cap.read()
     ret_d, depth = dep.read()
     
@@ -82,8 +92,8 @@ while cap.isOpened():
     yolo_boxes = yolo_results[0].boxes
     yolo_masks = yolo_results[0].masks
     
-    
-    for i in range(yolo_boxes.shape[0]):
+    detections = yolo_boxes.shape[0]
+    for i in range(detections):
         box = yolo_boxes[i].xyxy.tolist()[0]
         x1, y1, x2, y2 = int(box[0]), int(box[1]), int(box[2]), int(box[3])
         
@@ -106,34 +116,60 @@ while cap.isOpened():
             else:
                 final_sam_mask += mask_image
             
-        color = cv2.rectangle(color, (x1, y1), (x2, y2), (0, 255, 0), 2)
+        # color = cv2.rectangle(color, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
-    if SAM:
-        final_sam_mask = np.concatenate([final_sam_mask] * 3, axis=2)
-
-        
-
-        
+    if SAM and final_sam_mask is not None:
+        # final_sam_mask = np.concatenate([final_sam_mask] * 3, axis=2)
         cv2.imshow("YOLO + SAM mask", final_sam_mask.astype(np.float32))
+
+
     if OPEN3D:
-        depths = ((depth*final_sam_mask)*1500/255.0).astype(np.uint8)
+        if SAM:
+            # depths = ((depth*final_sam_mask)*1500/255.0).astype(np.uint8)
+
+            # depths = depth_data[frame_count]*final_sam_mask[:,:,0]
+            depths = gaussian_filter(depth_data[frame_count], sigma=1)
+            depths = depths*final_sam_mask[:,:,0]
+            print(np.unique(depths))
+        # else: depths = ((depth)*1500/255.0).astype(np.uint8)
+        else: depths = depth_data[frame_count]
         color_image = o3d.geometry.Image(color)
         depth_image = o3d.geometry.Image(depths)
         
         ds1 = 0.001
-        cam = o3d.camera.PinholeCameraIntrinsic(w, h, 621.70715, 621.9764, 323.3644, 244.8789)
+        cam = o3d.camera.PinholeCameraIntrinsic(W, H, 621.70715, 621.9764, 323.3644, 244.8789)
         rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
                     color_image,
                     depth_image,
                     depth_scale=1.0 / ds1,
-                    depth_trunc= 1,
+                    depth_trunc= 1.5,
                     convert_rgb_to_intensity=False)
         temp = o3d.geometry.PointCloud.create_from_rgbd_image(
                     rgbd_image, cam)
-        cl, ind = temp.remove_statistical_outlier(nb_neighbors=200,
-                                                        std_ratio=1.0)
-        o3d.visualization.draw_geometries([temp.select_by_index(ind)])
-        cv2.imshow("Depths", depths.astype(np.float32))
+        # cl, ind = temp.remove_statistical_outlier(nb_neighbors=200,
+        #                                                 std_ratio=1.0)
+        # # o3d.visualization.draw_geometries([temp])
+
+        ## Plane fitting through cropped pointcloud
+        plane_model, inliers = temp.segment_plane(distance_threshold=0.001,
+                                         ransac_n = 3,
+                                         num_iterations=1000)
+        [a, b, c, d] = plane_model
+        print(f"Plane equation: {a:.2f}x + {b:.2f}y + {c:.2f}z + {d:.2f} = 0")
+        
+        ## X, Y, Z orientations
+        mag = np.linalg.norm(np.array(plane_model))
+        rx = np.arccos(a/mag)
+        ry = np.arccos(b/mag)
+        rz = np.arccos(c/mag)
+        print(rx*180./np.pi,ry*180./np.pi,rz*180./np.pi)
+
+        inlier_cloud = temp.select_by_index(inliers)
+        inlier_cloud.paint_uniform_color([1.0, 0, 0])
+        outlier_cloud = temp.select_by_index(inliers, invert=True)
+        # o3d.visualization.draw_geometries([inlier_cloud, outlier_cloud])
+        
+        ## cv2.imshow("Depths", depths.astype(np.float32))
 
     color = cv2.cvtColor(color, cv2.COLOR_RGB2BGR)
 
@@ -147,9 +183,16 @@ while cap.isOpened():
         mask = np.sum(yolo_masks.data.cpu().numpy(), axis= 0)
         cv2.imshow('YOLO Segmentation Mask', mask)
     else: continue
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
 
+    end = time.time()
+    print("Time for 1 frame:", end - start)
+    k = cv2.waitKey(1)
+    frame_count += 1
+    if k == 27:
+         break 
+    if k == ord('o'):
+         OPEN3D = True
+    
 # Release video capture and writer objects
 cap.release()
 out.release()
