@@ -31,7 +31,12 @@ else:
     quit()
 
 SAM = True
-OPEN3D = False
+OPEN3D = True
+
+# if OPEN3D:
+#     vis = o3d.visualization.Visualizer()
+#     vis.create_window()
+
 
 model = YOLO(model_path_YOLO) 
 model.to(device)
@@ -124,7 +129,7 @@ while cap.isOpened():
 
 
     if OPEN3D:
-        if SAM:
+        if SAM and final_sam_mask is not None:
             # depths = ((depth*final_sam_mask)*1500/255.0).astype(np.uint8)
 
             # depths = depth_data[frame_count]*final_sam_mask[:,:,0]
@@ -146,9 +151,14 @@ while cap.isOpened():
                     convert_rgb_to_intensity=False)
         temp = o3d.geometry.PointCloud.create_from_rgbd_image(
                     rgbd_image, cam)
+        
+        # vis.add_geometry(temp)
+        # vis.poll_events()
+        # vis.update_renderer()
+
         # cl, ind = temp.remove_statistical_outlier(nb_neighbors=200,
         #                                                 std_ratio=1.0)
-        # # o3d.visualization.draw_geometries([temp])
+        o3d.visualization.draw_geometries([temp])
 
         ## Plane fitting through cropped pointcloud
         plane_model, inliers = temp.segment_plane(distance_threshold=0.001,
