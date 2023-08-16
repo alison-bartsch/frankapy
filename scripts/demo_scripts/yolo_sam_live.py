@@ -12,6 +12,8 @@ from ultralytics import YOLO
 from segment_anything import sam_model_registry, SamPredictor
 from scipy.ndimage import gaussian_filter
 
+# from frankapy.vision_utils import *
+
 """
 This file is used to detect the bounding boxes (the usb ports) live while using franka
 """
@@ -36,7 +38,12 @@ else:
 
 SAM = False
 OPEN3D = False
-
+FRANKA = True
+if FRANKA:
+    import robomail.communication as comm
+    FrankaIP = "172.26.5.54"
+    Messenger = comm.FullMessenger(FrankaIP, 5000, False)
+    Messenger.start()
 model = YOLO(model_path_YOLO) 
 model.to(device)
 
@@ -105,7 +112,10 @@ if __name__ == "__main__":
         depth_image_1 = (depths * 255.0 / 1500.0).astype(np.uint8)
 
         ####################  YOLO - SAM intergration with live Camera stream  ###########################################
+        points = point_cloud.calculate(depth_frame_1)
+        verts = np.asanyarray(points.get_vertices()).view(np.float32).reshape(-1, W, 3)
 
+        # given a bounding box (centroids), index verts to get the x,y,z position in camera frame
         if SAM:
             predictor.set_image(color_image_1)
             final_sam_mask = None
@@ -118,7 +128,8 @@ if __name__ == "__main__":
         for i in range(detections):
             box = yolo_boxes[i].xyxy.tolist()[0]
             x1, y1, x2, y2 = int(box[0]), int(box[1]), int(box[2]), int(box[3])
-            
+            x_c = int((x1 + x2) / 2)
+            y_c = int((y1 + y2)/2)
             if SAM:
                 x_c = int((x1 + x2) / 2)
                 y_c = int((y1 + y2)/2)
@@ -282,52 +293,35 @@ if __name__ == "__main__":
         #     cv2.imwrite(cam1_filename_c, color_image_1)
         #     cv2.imwrite(cam1_filename_d, depth_image_1)
         #     i += 1
-            
-            
-        # elif k == ord('x'):
-        #     T_ee_world = fa.get_pose()
-        #     print('Current pose: ', T_ee_world)
-        #     T_ee_world.translation += [0.1, 0., 0.]
-        #     fa.goto_pose(T_ee_world)
-        #     print('New pose: ', fa.get_pose())
-            
-        # elif k == ord('y'):
-        #     T_ee_world = fa.get_pose()
-        #     print('Current pose: ', T_ee_world)
-        #     T_ee_world.translation += [0., 0.1, 0.]
-        #     fa.goto_pose(T_ee_world)
-        #     print('New pose: ', fa.get_pose())
-            
-        # elif k == ord('z'):
-        #     T_ee_world = fa.get_pose()
-        #     print('Current pose: ', T_ee_world)
-        #     T_ee_world.translation += [0., 0., 0.1]
-        #     fa.goto_pose(T_ee_world)
-        #     print('New pose: ', fa.get_pose())
-            
-            
-        # elif k == ord('c'):
-        #     T_ee_world = fa.get_pose()
-        #     print('Current pose: ', T_ee_world)
-        #     T_ee_world.translation -= [0.1, 0., 0.]
-        #     fa.goto_pose(T_ee_world)
-        #     print('New pose: ', fa.get_pose())
-            
-        # elif k == ord('u'):
-        #     T_ee_world = fa.get_pose()
-        #     print('Current pose: ', T_ee_world)
-        #     T_ee_world.translation -= [0., 0.1, 0.]
-        #     fa.goto_pose(T_ee_world)
-        #     print('New pose: ', fa.get_pose())
-            
-        # elif k == ord('a'):
-        #     T_ee_world = fa.get_pose()
-        #     print('Current pose: ', T_ee_world)
-        #     T_ee_world.translation -= [0., 0., 0.1]
-        #     fa.goto_pose(T_ee_world)
-        #     print('New pose: ', fa.get_pose())
-            
+
+        # --------- Robo communication -----------
+
         
-            
+        
+        ## Move to a location
+        if detections > 0:
+            centroids = np.array([x_c, y_c])
+            obj_points = verts[int(centroids[1]), int(centroids[0])].reshape(-1,3)
+        
+            print(obj_points)
+            obj_points[0,0] = -obj_points[0,0]
+            obj_points[0,1] = -obj_points[0,1]
+            rotation = np.eye(4)
+            # print("depth shpe",depths.shape)
+            # Z = depths[y_c, x_c]*ds1
+            # fx, fy, cx, cy = 621.70715, 621.9764, 323.3644, 244.8789
+            # X = Z * (x_c - cx)/ fx 
+            # Y = Z * (y_c - cy)/ fy 
+            # position = np.array([X, Y, Z])
+            # print(position)
+            # send_pose = [position, rotation]
+            if FRANKA:
+                send_pose = [obj_points, rotation]
+                Messenger.send_object(send_object = send_pose, object_name= "pose")
+                FRANKA = False
+
+        # ## To quit
+    if FRANKA:
+        Messenger.send_object("stop", "end program")           
             
     cv2.destroyAllWindows()
